@@ -1,8 +1,8 @@
 /* Leo Personal — service worker único para todas as fichas.
-   Rede primeiro (sempre pega a versão mais nova quando há internet) com fallback
+   Rede primeiro (sempre pega a versão mais nova publicada quando há internet) com fallback
    para o cache em até 4 s (academia com sinal fraco ou offline).
    Não precisa trocar versão a cada atualização: o conteúdo novo chega sozinho. */
-const CACHE = 'leo-treinos-v1';
+const CACHE = 'leo-treinos-v2';
 const CORE = ['./app.js', './app.css', './icons/coach.jpg', './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
@@ -16,7 +16,11 @@ self.addEventListener('activate', e => {
 });
 
 function fromNetwork(req) {
-  return fetch(req, { cache: 'no-cache' }).then(res => {
+  // Parâmetro único fura o cache de 10 min do GitHub Pages: com internet, sempre vem a versão publicada mais nova.
+  const fresh = new URL(req.url);
+  if (fresh.origin === location.origin) fresh.searchParams.set('_v', Date.now());
+  const net = fresh.origin === location.origin ? fetch(fresh.href, { cache: 'no-store', credentials: 'same-origin' }) : fetch(req);
+  return net.then(res => {
     if (res && (res.ok || res.type === 'opaque')) {
       const copy = res.clone();
       caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {});
