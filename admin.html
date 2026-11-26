@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#15181D">
+<title>Painel do Leo — Leo Personal</title>
+<link rel="icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+<style>
+  .wrap{max-width:820px}
+  label.f{display:block;font-size:12.5px;color:var(--muted);margin-top:10px}
+  label.f>span{display:block;margin-bottom:4px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+  .in{width:100%;background:#0F1318;border:1px solid var(--line);border-radius:8px;color:var(--chalk);padding:9px 10px;font-family:inherit;font-size:16px}
+  textarea.in{min-height:70px;resize:vertical}
+  .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+  @media (max-width:560px){ .grid2,.grid3{grid-template-columns:minmax(0,1fr)} }
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-top:16px}
+  .panel h2{font-family:'Anton',sans-serif;font-weight:400;font-size:20px;text-transform:uppercase}
+  .hint{font-size:13px;color:var(--muted);margin-top:6px}
+  .item{display:flex;align-items:center;gap:10px;background:#171C22;border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-top:6px}
+  .item .thumb{width:36px;height:36px}.item .ic{width:24px;height:24px}
+  .item .nm{flex:1;min-width:0;font-weight:700;font-size:14.5px}
+  .item .nm small{display:block;font-weight:400;color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:11px}
+  .item.sec{background:transparent;border-style:dashed}
+  .item.sec .nm{color:var(--day);font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+  .ib{width:34px;height:34px;border-radius:8px;border:1px solid var(--line);background:#0F1318;color:var(--chalk);cursor:pointer;font-size:14px;flex:none}
+  .ib.del{color:#E88}
+  .edit{border:1px solid var(--day);border-radius:10px;padding:12px;margin-top:6px;background:#141920}
+  .icons{display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:6px;margin-top:6px}
+  .icons button{height:44px;border-radius:8px;border:1px solid var(--line);background:#0F1318;color:var(--muted);cursor:pointer;display:grid;place-items:center}
+  .icons button[aria-pressed="true"]{border-color:var(--day);color:var(--day)}
+  .icons .ic{width:26px;height:26px}
+  .chkl{display:inline-flex;align-items:center;gap:6px;margin:10px 14px 0 0;font-size:14px}
+  .chkl input{width:18px;height:18px}
+  .cat{max-height:340px;overflow:auto;margin-top:8px}
+  .cat .item{cursor:pointer}
+  .bar{position:sticky;bottom:0;background:#11151A;border-top:1px solid var(--line);padding:12px 16px;margin:24px -16px 0;display:flex;gap:8px;flex-wrap:wrap}
+  #out{display:none;width:100%;min-height:120px;margin-top:10px;font-family:'IBM Plex Mono',monospace;font-size:11px}
+  .msg{font-size:13px;color:var(--yellow);margin-top:8px;min-height:18px}
+</style>
+</head>
+<body>
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="i-puxada" viewBox="0 0 24 24"><line x1="5" y1="4" x2="19" y2="4"/><circle cx="12" cy="9" r="2"/><path d="M6.5 4.5 L10.4 7.6 M17.5 4.5 L13.6 7.6"/><path d="M12 11 v5 M12 16 l-3 4 M12 16 l3 4"/></symbol>
+  <symbol id="i-remada" viewBox="0 0 24 24"><circle cx="8" cy="6.5" r="2"/><path d="M8 8.5 v6.5"/><path d="M8 11 h8 M16 9 v4"/><path d="M8 15 l5.5 3 M8 15 l-2.5 4.5"/></symbol>
+  <symbol id="i-voador" viewBox="0 0 24 24"><circle cx="12" cy="6" r="2"/><path d="M12 8.5 v6.5 M12 15 l-2.5 4.5 M12 15 l2.5 4.5"/><path d="M12 10.5 C8.5 10.5 6 8 5.2 5.8 M12 10.5 C15.5 10.5 18 8 18.8 5.8"/></symbol>
+  <symbol id="i-voadorinv" viewBox="0 0 24 24"><circle cx="12" cy="6" r="2"/><path d="M12 8.5 v6.5 M12 15 l-2.5 4.5 M12 15 l2.5 4.5"/><path d="M12 10.5 L5.5 8 M12 10.5 L18.5 8"/><path d="M6.8 6.2 L5.5 8 L7.2 9.4 M17.2 6.2 L18.5 8 L16.8 9.4"/></symbol>
+  <symbol id="i-pressfrontal" viewBox="0 0 24 24"><circle cx="8.5" cy="6" r="2"/><path d="M8.5 8.5 v6.5 M8.5 15 l-2.5 4.5 M8.5 15 l3 4.5"/><path d="M8.5 10.5 h9 M17.5 8.2 v4.6"/></symbol>
+  <symbol id="i-supino" viewBox="0 0 24 24"><line x1="4" y1="19" x2="20" y2="19"/><circle cx="17.6" cy="14.6" r="1.9"/><path d="M5 15.5 h10.5"/><path d="M10 15.5 V9"/><line x1="7" y1="9" x2="13" y2="9"/></symbol>
+  <symbol id="i-pullover" viewBox="0 0 24 24"><line x1="4" y1="19" x2="20" y2="19"/><circle cx="17.6" cy="14.6" r="1.9"/><path d="M6 15.5 h9.5"/><path d="M14 15.5 C14 10.5 9.5 8.5 6.5 9.8"/><circle cx="6" cy="10.2" r="1.1"/></symbol>
+  <symbol id="i-triceps" viewBox="0 0 24 24"><circle cx="10.5" cy="5.5" r="2"/><path d="M10.5 7.5 v7 M10.5 14.5 l-2.5 4.5 M10.5 14.5 l2.5 4.5"/><path d="M10.5 9.5 L14.5 11 M14.5 11 v5"/><line x1="12.5" y1="16" x2="16.5" y2="16"/></symbol>
+  <symbol id="i-dip" viewBox="0 0 24 24"><path d="M3.5 12.5 h4.5 M5.5 12.5 v6.5"/><circle cx="11" cy="6" r="1.9"/><path d="M11 8 L10 13 M11 9 L8 12.5"/><path d="M10 13 L16 15.5 L19.5 15.5"/></symbol>
+  <symbol id="i-biceps" viewBox="0 0 24 24"><circle cx="10.5" cy="5.5" r="2"/><path d="M10.5 7.5 v7 M10.5 14.5 l-2.5 4.5 M10.5 14.5 l2.5 4.5"/><path d="M10.5 9.5 L15 12 L15.5 7.2"/><line x1="13.8" y1="6.8" x2="17.2" y2="7.4"/></symbol>
+  <symbol id="i-agacho" viewBox="0 0 24 24"><line x1="5.5" y1="7" x2="18.5" y2="7"/><circle cx="12" cy="4.2" r="1.7"/><path d="M12 7 v4"/><path d="M12 11 L8.8 13.5 L9.8 19 M12 11 L15.2 13.5 L14.2 19"/></symbol>
+  <symbol id="i-legpress" viewBox="0 0 24 24"><circle cx="6.5" cy="8.5" r="1.9"/><path d="M6.5 10.5 L8 16"/><path d="M8 15.5 L12 11.5 L16.2 13.6"/><line x1="18.8" y1="7" x2="15.2" y2="18"/></symbol>
+  <symbol id="i-extensora" viewBox="0 0 24 24"><line x1="4.5" y1="19" x2="12.5" y2="19"/><circle cx="8" cy="5.5" r="1.9"/><path d="M8 7.5 v6.5"/><path d="M8 14 h5.5 M13.5 14 L18 10.5"/></symbol>
+  <symbol id="i-flexora" viewBox="0 0 24 24"><line x1="4" y1="16.5" x2="20" y2="16.5"/><circle cx="5.8" cy="12.6" r="1.8"/><path d="M8 14 h8"/><path d="M16 14 L18.2 8.8"/><circle cx="18.6" cy="7.8" r="1"/></symbol>
+  <symbol id="i-gluteo" viewBox="0 0 24 24"><line x1="3.5" y1="18" x2="20.5" y2="18"/><path d="M4 18 v-5.5 h3"/><circle cx="5.8" cy="9.8" r="1.7"/><path d="M7.5 10.8 L12.5 9.5 M12.5 9.5 L15.5 13.5 L15.5 18"/><circle cx="12.5" cy="6.8" r="1.4"/></symbol>
+  <symbol id="i-pant" viewBox="0 0 24 24"><path d="M3.5 19.5 h8.5 M12 19.5 v-3.5 h8.5"/><circle cx="15.5" cy="4.8" r="1.8"/><path d="M15.5 6.8 v6 M15.5 12.8 L14.8 15.3 M15.5 12.8 L16.4 15.3"/></symbol>
+  <symbol id="i-adutora" viewBox="0 0 24 24"><circle cx="12" cy="5.2" r="1.9"/><path d="M12 7.2 v5"/><path d="M12 12.2 L7.5 18.5 M12 12.2 L16.5 18.5"/><path d="M6 14.6 l2.6 1.4 M18 14.6 l-2.6 1.4"/></symbol>
+  <symbol id="i-abdutora" viewBox="0 0 24 24"><circle cx="12" cy="5.2" r="1.9"/><path d="M12 7.2 v5"/><path d="M12 12.2 L7.5 18.5 M12 12.2 L16.5 18.5"/><path d="M10.2 15.2 l-2.8 1.2 M13.8 15.2 l2.8 1.2"/></symbol>
+  <symbol id="i-ombropress" viewBox="0 0 24 24"><line x1="6" y1="4" x2="18" y2="4"/><circle cx="12" cy="8.2" r="1.9"/><path d="M12 10.5 L7.5 4.6 M12 10.5 L16.5 4.6"/><path d="M12 10.5 v5 M12 15.5 l-2.5 4 M12 15.5 l2.5 4"/></symbol>
+  <symbol id="i-lateral" viewBox="0 0 24 24"><circle cx="12" cy="6" r="2"/><path d="M12 8.5 v6.5 M12 15 l-2.5 4.5 M12 15 l2.5 4.5"/><path d="M12 10.5 h-7 M12 10.5 h7"/><path d="M4.6 9.2 v2.6 M19.4 9.2 v2.6"/></symbol>
+  <symbol id="i-encolhe" viewBox="0 0 24 24"><circle cx="12" cy="6.2" r="1.9"/><path d="M12 8.5 v7 M12 15.5 l-2.5 4 M12 15.5 l2.5 4"/><path d="M12 9.5 L8.5 10.6 V16 M12 9.5 L15.5 10.6 V16"/><path d="M4.6 6.8 l1.6 -1.7 l1.6 1.7 M16.2 6.8 l1.6 -1.7 l1.6 1.7"/></symbol>
+  <symbol id="i-along" viewBox="0 0 24 24"><circle cx="9" cy="5" r="1.8"/><path d="M9 7 v5 M9 12 L5.5 18 M9 12 L14 15 L19 15"/><path d="M9 9 L14 6.5"/></symbol>
+  <symbol id="i-bike" viewBox="0 0 24 24"><circle cx="5.5" cy="17" r="3.2"/><circle cx="18.5" cy="17" r="3.2"/><path d="M5.5 17 L9.5 8.5 h4.5 L18.5 17"/><path d="M9 8.5 h6"/><circle cx="15" cy="4.5" r="1.4"/></symbol>
+  <symbol id="i-abs" viewBox="0 0 24 24"><circle cx="6" cy="7.5" r="1.9"/><path d="M6 9.5 L9 13.5 L15 13.5"/><path d="M9 13.5 L8 18.5 M15 13.5 L17.5 17"/><path d="M11 6.5 h5 M11 9.5 h5"/></symbol>
+  <symbol id="i-terra" viewBox="0 0 24 24"><line x1="4" y1="15.5" x2="20" y2="15.5"/><circle cx="4.6" cy="15.5" r="2.2"/><circle cx="19.4" cy="15.5" r="2.2"/><circle cx="12" cy="4.2" r="1.8"/><path d="M12 6 v6.5 M12 12.5 l-2.4 6 M12 12.5 l2.4 6"/><path d="M12 8 L9.4 15.5 M12 8 L14.6 15.5"/></symbol>
+  <symbol id="i-hiper" viewBox="0 0 24 24"><path d="M4 18.5 h6 M7 18.5 v-4.5"/><path d="M7 14 L12 12.5 C15.5 11.5 17.5 8.5 18 5.5"/><circle cx="18.6" cy="4.2" r="1.6"/><path d="M9.5 13.4 L10.5 18.5"/></symbol>
+  <symbol id="i-perdigueiro" viewBox="0 0 24 24"><line x1="3" y1="18.5" x2="21" y2="18.5"/><circle cx="7" cy="9.2" r="1.7"/><path d="M8.6 10.4 L15 10.8"/><path d="M9 10.6 V18.5 M14.2 10.8 V18.5"/><path d="M8 9.6 L3.2 7.6"/><path d="M15 10.8 L21 9.6"/></symbol>
+  <symbol id="i-step" viewBox="0 0 24 24"><path d="M12.5 19.5 h8 v-4 h-8 z"/><line x1="3" y1="19.5" x2="12.5" y2="19.5"/><circle cx="10" cy="4.3" r="1.8"/><path d="M10 6.3 v6.2 M10 12.5 L14.6 13 L15 15.5 M10 12.5 L8.2 19.5 M10 8.3 L7.6 11 M10 8.3 L12.4 10.6"/></symbol>
+  <symbol id="i-esteira" viewBox="0 0 24 24"><path d="M3 19 h14.5 l3.5 -2.2"/><path d="M17.5 19 L19.5 8 h1.8"/><circle cx="10" cy="4.3" r="1.7"/><path d="M10 6.2 L9.2 11.5 M9.2 11.5 L12 14 L11.2 17.6 M9.2 11.5 L7.4 14.6 L5.4 17 M9.8 7.8 L12.6 10 M9.8 7.8 L7.2 9.6"/></symbol>
+  <symbol id="i-escada" viewBox="0 0 24 24"><path d="M3 20.5 h4 v-3.5 h4 v-3.5 h4 v-3.5 h5.5"/><circle cx="13" cy="3.6" r="1.6"/><path d="M13 5.4 v4.2 M13 9.6 L15 11.4 L15 13.5 M13 9.6 L11 11.8 L11 17 M13 6.8 L15.4 8.2 M13 6.8 L10.8 8.4"/></symbol>
+  <symbol id="i-transport" viewBox="0 0 24 24"><ellipse cx="12" cy="18.6" rx="7.5" ry="1.9"/><circle cx="11" cy="4.3" r="1.7"/><path d="M11 6.2 v6 M11 12.2 L8.4 17.4 M11 12.2 L14.8 16.8 M11 8 L14.8 7 L16.2 3.2"/></symbol>
+  <symbol id="i-extombro" viewBox="0 0 24 24"><line x1="8" y1="3" x2="17" y2="3"/><circle cx="10" cy="7.2" r="1.8"/><path d="M10 9.2 v6 M10 15.2 l-2.2 4.4 M10 15.2 l2.2 4.4 M10 10.2 L13.8 14"/><line x1="12.6" y1="14.6" x2="15" y2="13.4"/><path d="M14.2 13.8 L16.2 3" stroke-dasharray="1.4 1.6"/></symbol>
+</svg>
+<div class="wrap">
+<header>
+  <div class="eyebrow">Leo Personal · painel do treinador</div>
+  <div class="brand"><img class="coach" src="icons/coach.jpg" alt="Leo"><div class="brand-txt"><h1>Painel do Leo</h1><div class="subtitle">Criar e editar fichas</div></div></div>
+  <div class="presc">Escolha um aluno ou comece uma ficha nova. Monte os dias com exercícios do catálogo, veja a prévia como o aluno verá e baixe o arquivo <b>data.js</b> para publicar.</div>
+</header>
+
+<div class="panel">
+  <h2>Aluno</h2>
+  <div class="grid2">
+    <label class="f"><span>Abrir ficha</span><select class="in" id="pick"></select></label>
+    <label class="f"><span>Nome do aluno</span><input class="in" id="fName" placeholder="Ex.: Maria Souza"></label>
+  </div>
+  <div class="grid3">
+    <label class="f"><span>Endereço (slug)</span><input class="in" id="fSlug" placeholder="maria"></label>
+    <label class="f"><span>Mês da ficha</span><input class="in" id="fMonth" placeholder="Dezembro 2026"></label>
+    <label class="f"><span>WhatsApp do Leo</span><input class="in" id="fPhone" inputmode="tel" placeholder="5561999999999"></label>
+  </div>
+  <div class="hint" id="linkHint"></div>
+</div>
+
+<div class="panel" id="daysPanel">
+  <h2>Dias de treino</h2>
+  <nav id="dtabs" style="position:static;border:0;padding:10px 0 0"></nav>
+  <div id="dayEdit"></div>
+</div>
+
+<div class="panel">
+  <h2>Catálogo de exercícios</h2>
+  <div class="hint">Toque em um exercício para adicioná-lo ao dia aberto, já com ícone, equipamento e orientação. Depois ajuste séries e repetições.</div>
+  <input class="in" id="q" placeholder="Buscar: supino, flexora, bíceps…" style="margin-top:10px">
+  <div class="cat" id="cat"></div>
+</div>
+
+<div class="bar">
+  <a class="btn day" id="prevBtn" href="alunos/preview/" target="_blank" rel="noopener" style="--day:var(--yellow)">👁 Pré-visualizar</a>
+  <button class="btn solid" id="dlBtn">⬇ Baixar data.js</button>
+  <button class="btn" id="cpBtn">Copiar data.js</button>
+  <div class="msg" id="msg" style="flex-basis:100%"></div>
+  <textarea id="out" class="in" readonly></textarea>
+</div>
+<footer>Para publicar: envie o <b>data.js</b> ao Dan (ou peça ao Claude) para colocar em <code>alunos/&lt;slug&gt;/</code> no repositório <b>leo-treinos</b>. O rascunho fica salvo neste navegador enquanto você edita.<br>Importante: não troque o “endereço” de um aluno que já usa o app, para não separar o histórico dele.</footer>
+</div>
+
+<script src="alunos/index.js"></script>
+<script>
+(function(){
+'use strict';
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function slugify(s){ return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40); }
+var COLORS = [['red','Vermelho'],['green','Verde'],['blue','Azul'],['yellow','Amarelo'],['white','Branco']];
+var CV = { red:'var(--red)', green:'var(--green)', blue:'var(--blue)', yellow:'var(--yellow)', white:'var(--white)' };
+var ICONS = [].map.call(document.querySelectorAll('symbol'), function(s){ return s.id; });
+var ICON_NAMES = {'i-along':'alongamento','i-abs':'abdômen','i-bike':'bike','i-esteira':'esteira','i-escada':'escada','i-transport':'transport'};
+function icon(id){ return '<svg class="ic"><use href="#'+esc(id)+'"/></svg>'; }
+var ALUNOS = window.ALUNOS || [];
+var fichas = {}, catalog = [], F = null, dayIdx = 0, editing = null;
+var LS = (function(){ try{ localStorage.setItem('__t','1'); localStorage.removeItem('__t'); return localStorage; }catch(e){ return null; } })();
+
+/* ---------- carregar fichas existentes ---------- */
+function loadScript(src){ return new Promise(function(res){ var s=document.createElement('script'); s.src=src+'?t='+Date.now(); s.onload=function(){ res(window.FICHA); }; s.onerror=function(){ res(null); }; document.body.appendChild(s); }); }
+function loadAll(){
+  return ALUNOS.reduce(function(p,a){ return p.then(function(){ window.FICHA=null; return loadScript('alunos/'+a.slug+'/data.js').then(function(f){ if(f) fichas[a.slug]=JSON.parse(JSON.stringify(f)); }); }); }, Promise.resolve());
+}
+function buildCatalog(){
+  var seen = {};
+  Object.keys(fichas).forEach(function(s){ fichas[s].days.forEach(function(d){ d.items.forEach(function(it){
+    if(it.type==='sec') return;
+    var k = it.name.toLowerCase(); if(seen[k]) return; seen[k]=1;
+    var c = JSON.parse(JSON.stringify(it)); delete c.li; catalog.push(c);
+  }); }); });
+  catalog.sort(function(a,b){ return a.name.localeCompare(b.name,'pt'); });
+}
+
+/* ---------- ficha nova / abrir ---------- */
+function newFicha(){
+  return { name:'', slug:'', month:'', coachPhone:'', days:[
+    { id:'a', label:'A · ', title:'Treino A', sub:'', color:'red', items:[] },
+    { id:'b', label:'B · ', title:'Treino B', sub:'', color:'green', items:[] },
+    { id:'c', label:'C · ', title:'Treino C', sub:'', color:'blue', items:[] } ] };
+}
+function draftKey(){ return 'leo-admin-draft-'+(F.slug||'nova'); }
+function saveDraft(){ try{ if(LS){ LS.setItem(draftKey(), JSON.stringify(F)); LS.setItem('leo-admin-preview', JSON.stringify(F)); } }catch(e){} }
+function open(slug){
+  var base = slug && fichas[slug] ? fichas[slug] : newFicha(), draft = null;
+  try{ draft = LS && LS.getItem('leo-admin-draft-'+(slug||'nova')); }catch(e){}
+  F = JSON.parse(draft || JSON.stringify(base)); dayIdx = 0; editing = null;
+  if(draft) msg('Rascunho não publicado recuperado deste navegador.');
+  renderAll();
+}
+function msg(t){ $('msg').textContent = t||''; }
+
+/* ---------- formulário do aluno ---------- */
+function renderStudent(){
+  $('fName').value=F.name||''; $('fSlug').value=F.slug||''; $('fMonth').value=F.month||''; $('fPhone').value=F.coachPhone||'';
+  $('fSlug').disabled = !!fichas[F.slug];
+  $('linkHint').innerHTML = F.slug ? 'Link do aluno: <b class="mono">danfermartins.github.io/leo-treinos/alunos/'+esc(F.slug)+'/</b>' : 'O endereço é criado a partir do nome.';
+}
+$('pick').onchange=function(){ open(this.value); };
+$('fName').oninput=function(){ F.name=this.value; if(!fichas[F.slug] && !$('fSlug').dataset.touched){ F.slug=slugify(this.value.split(' ')[0]); $('fSlug').value=F.slug; } renderStudent(); saveDraft(); };
+$('fSlug').oninput=function(){ this.dataset.touched=1; F.slug=slugify(this.value); renderStudent(); saveDraft(); };
+$('fMonth').oninput=function(){ F.month=this.value; saveDraft(); };
+$('fPhone').oninput=function(){ F.coachPhone=this.value.replace(/\D/g,''); saveDraft(); };
+
+/* ---------- dias ---------- */
+function renderDays(){
+  $('dtabs').innerHTML = F.days.map(function(d,i){
+    return '<button class="tab" aria-selected="'+(i===dayIdx)+'" data-di="'+i+'"><span class="tab-top"><span class="plate" style="color:'+CV[d.color]+'"></span>'+esc(d.label||d.id.toUpperCase())+'</span><span class="tab-date">'+d.items.filter(function(x){ return x.type!=='sec'; }).length+' itens</span></button>';
+  }).join('') + '<button class="tab" data-add-day><span class="tab-top">＋ Dia</span><span class="tab-date">novo</span></button>';
+  var d = F.days[dayIdx]; if(!d){ $('dayEdit').innerHTML=''; return; }
+  $('daysPanel').style.setProperty('--day', CV[d.color]);
+  $('dayEdit').innerHTML =
+    '<div class="grid3"><label class="f"><span>Nome da aba</span><input class="in" data-d="label" value="'+esc(d.label)+'"></label>'
+    +'<label class="f"><span>Título</span><input class="in" data-d="title" value="'+esc(d.title)+'"></label>'
+    +'<label class="f"><span>Cor</span><select class="in" data-d="color">'+COLORS.map(function(c){ return '<option value="'+c[0]+'"'+(c[0]===d.color?' selected':'')+'>'+c[1]+'</option>'; }).join('')+'</select></label></div>'
+    +'<label class="f"><span>Grupos musculares (subtítulo)</span><input class="in" data-d="sub" value="'+esc(d.sub)+'" placeholder="Peito · Ombro · Tríceps"></label>'
+    +'<div style="margin-top:14px">'+d.items.map(itemRow).join('')+'</div>'
+    +(d.items.length?'':'<div class="hint">Nenhum exercício ainda. Use o catálogo abaixo ou os botões.</div>')
+    +'<div class="row"><button class="btn" data-add="sec">＋ Seção</button><button class="btn" data-add="ex">＋ Exercício em branco</button><button class="btn" data-add="cardio">＋ Cardio / alongamento</button>'
+    +(F.days.length>1?'<button class="btn" data-del-day style="margin-left:auto;color:#E88">Remover dia</button>':'')+'</div>';
+}
+function schemeOf(it){
+  var n = it.parts[0].reps.length;
+  var combo = it.parts[0].reps.map(function(_,s){ return it.parts.map(function(p){ return p.reps[s]||''; }).join('+'); });
+  var u = combo.filter(function(v,i,a){ return a.indexOf(v)===i; });
+  return n+' × '+(u.length===1 ? u[0] : combo.join('·'));
+}
+function itemRow(it,i){
+  var tools = '<button class="ib" data-mv="-1" data-i="'+i+'" aria-label="Subir">↑</button><button class="ib" data-mv="1" data-i="'+i+'" aria-label="Descer">↓</button>'
+    +(it.type!=='sec'?'<button class="ib" data-ed="'+i+'" aria-label="Editar">✎</button>':'')+'<button class="ib del" data-rm="'+i+'" aria-label="Remover">✕</button>';
+  if(it.type==='sec') return '<div class="item sec"><input class="in" data-sec="'+i+'" value="'+esc(it.t)+'" style="flex:1"> '+tools+'</div>';
+  var sub = it.type==='cardio' ? (it.min?it.min+' min':'sem cronômetro') : (it.scheme||'')+(it.bs?' · bi-set':'');
+  return '<div class="item"><div class="thumb">'+icon(it.i)+'</div><div class="nm">'+esc(it.name)+'<small>'+esc(sub)+'</small></div>'+tools+'</div>'
+    + (editing===i ? editor(it,i) : '');
+}
+function repsTxt(r){ var u=r.filter(function(v,i,a){ return a.indexOf(v)===i; }); return u.length===1 ? u[0] : r.join('/'); }
+function editor(it,i){
+  var h = '<div class="edit">'
+    +'<label class="f"><span>Nome</span><input class="in" data-e="name" value="'+esc(it.name)+'"></label>'
+    +'<label class="f"><span>Ícone</span></label><div class="icons">'+ICONS.map(function(id){ return '<button data-icon="'+id+'" aria-pressed="'+(id===it.i)+'" title="'+esc(ICON_NAMES[id]||id.slice(2))+'">'+icon(id)+'</button>'; }).join('')+'</div>';
+  if(it.type==='cardio'){
+    return h+'<div class="grid2"><label class="f"><span>Minutos (0 = sem cronômetro)</span><input class="in" data-e="min" inputmode="numeric" value="'+(it.min||0)+'"></label>'
+      +'<label class="f"><span>Busca do vídeo</span><input class="in" data-e="v" value="'+esc(it.v||'')+'"></label></div>'
+      +'<label class="f"><span>Como fazer</span><textarea class="in" data-e="cue">'+esc(it.cue||'')+'</textarea></label><div class="row"><button class="btn solid" data-ed="'+i+'">Pronto</button></div></div>';
+  }
+  var p0=it.parts[0], p1=it.parts[1];
+  h += '<div class="grid3"><label class="f"><span>Séries</span><input class="in" data-e="nsets" inputmode="numeric" value="'+p0.reps.length+'"></label>'
+    +'<label class="f"><span>Repetições '+(p1?'(A)':'')+'</span><input class="in" data-e="reps0" value="'+esc(repsTxt(p0.reps))+'" placeholder="12 ou 12/10/8 ou 12+12"></label>'
+    +'<label class="f"><span>Descanso (s)</span><input class="in" data-e="rest" inputmode="numeric" value="'+(it.rest||60)+'"></label></div>'
+    +'<label class="f"><span>Equipamento / observação</span><input class="in" data-e="e" value="'+esc(it.e||'')+'"></label>'
+    +'<span class="chkl"><input type="checkbox" data-e="bw0"'+(p0.bw?' checked':'')+'> Peso corporal</span>'
+    +'<span class="chkl"><input type="checkbox" data-e="sides0"'+(p0.sides?' checked':'')+'> Cada lado</span>'
+    +'<span class="chkl"><input type="checkbox" data-e="w"'+(it.w?' checked':'')+'> Aviso de aquecimento</span>'
+    +'<span class="chkl"><input type="checkbox" data-e="bs"'+(p1?' checked':'')+'> Bi-set (2º exercício)</span>';
+  if(p1) h += '<div class="grid2"><label class="f"><span>Exercício A</span><input class="in" data-e="n0" value="'+esc(p0.n)+'"></label><label class="f"><span>Exercício B</span><input class="in" data-e="n1" value="'+esc(p1.n)+'"></label></div>'
+    +'<div class="grid2"><label class="f"><span>Repetições (B)</span><input class="in" data-e="reps1" value="'+esc(repsTxt(p1.reps))+'"></label><div><span class="chkl"><input type="checkbox" data-e="bw1"'+(p1.bw?' checked':'')+'> B com peso corporal</span></div></div>';
+  return h+'<label class="f"><span>Execução</span><textarea class="in" data-e="c">'+esc(it.c||'')+'</textarea></label>'
+    +'<label class="f"><span>Busca do vídeo no YouTube</span><input class="in" data-e="v" value="'+esc(it.v||'')+'"></label>'
+    +'<div class="row"><button class="btn solid" data-ed="'+i+'">Pronto</button></div></div>';
+}
+function curDay(){ return F.days[dayIdx]; }
+function uniqId(base){ var d=curDay(), id=slugify(base)||'ex', n=2, ids=d.items.map(function(x){ return x.id; }); var out=id; while(ids.indexOf(out)>=0) out=id+'-'+(n++); return out; }
+function setReps(p, txt, n){
+  txt = String(txt||'').trim() || '10';
+  var arr = txt.indexOf('/')>=0 ? txt.split('/').map(function(s){ return s.trim(); }) : null;
+  n = Math.max(1, Math.min(10, n || (arr ? arr.length : p.reps.length || 3)));
+  p.reps = []; for (var s=0;s<n;s++) p.reps.push(arr ? (arr[s] || arr[arr.length-1]) : txt);
+}
+$('daysPanel').addEventListener('click', function(e){
+  var t=e.target, b, d=curDay();
+  if((b=t.closest('[data-di]'))){ dayIdx=+b.dataset.di; editing=null; renderDays(); return; }
+  if(t.closest('[data-add-day]')){ var id='abcdefgh'[F.days.length]||('d'+F.days.length); F.days.push({ id:id, label:id.toUpperCase()+' · ', title:'Treino '+id.toUpperCase(), sub:'', color:COLORS[F.days.length%5][0], items:[] }); dayIdx=F.days.length-1; editing=null; changed(); return; }
+  if(t.closest('[data-del-day]')){ if(t.dataset.armed){ F.days.splice(dayIdx,1); dayIdx=0; editing=null; changed(); } else { t.dataset.armed=1; t.textContent='Toque de novo para remover o dia'; } return; }
+  if((b=t.closest('[data-add]'))){
+    var k=b.dataset.add, it;
+    if(k==='sec') it={ type:'sec', t:'Nova seção' };
+    else if(k==='cardio') it={ type:'cardio', id:uniqId('cardio'), i:'i-along', name:'Alongamento', min:0, cue:'', v:'' };
+    else it={ type:'ex', id:uniqId('exercicio'), i:'i-supino', name:'Novo exercício', e:'', scheme:'3 × 12', rest:60, c:'', v:'', parts:[{ n:'Novo exercício', reps:['12','12','12'] }] };
+    d.items.push(it); editing = it.type==='sec' ? null : d.items.length-1; changed(); return;
+  }
+  if((b=t.closest('[data-mv]'))){ var i=+b.dataset.i, j=i+(+b.dataset.mv); if(j<0||j>=d.items.length) return; var x=d.items[i]; d.items[i]=d.items[j]; d.items[j]=x; editing=null; changed(); return; }
+  if((b=t.closest('[data-rm]'))){ if(b.dataset.armed){ d.items.splice(+b.dataset.rm,1); editing=null; changed(); } else { b.dataset.armed=1; b.textContent='?'; b.title='Toque de novo para remover'; } return; }
+  if((b=t.closest('[data-ed]'))){ var n=+b.dataset.ed; editing = editing===n ? null : n; renderDays(); return; }
+  if((b=t.closest('[data-icon]'))){ d.items[editing].i=b.dataset.icon; changed(); return; }
+});
+$('daysPanel').addEventListener('input', function(e){ field(e.target, false); });
+$('daysPanel').addEventListener('change', function(e){ field(e.target, true); });
+function field(t, commit){
+  var d=curDay();
+  if(t.dataset.d){ d[t.dataset.d]=t.value; saveDraft(); if(commit || t.dataset.d==='color') renderDays(); return; }
+  if(t.dataset.sec){ d.items[+t.dataset.sec].t=t.value; saveDraft(); return; }
+  var k=t.dataset.e; if(!k || editing==null) return;
+  var it=d.items[editing], v=t.type==='checkbox'?t.checked:t.value;
+  if(it.type==='cardio'){ if(k==='min') it.min=parseInt(v,10)||0; else it[k]=v; if(k==='name'){ it.name=v; } saveDraft(); if(commit) renderDays(); return; }
+  var p0=it.parts[0];
+  if(k==='name'){ it.name=v; if(it.parts.length===1) p0.n=v; }
+  else if(k==='nsets'){ var n=parseInt(v,10); if(n) it.parts.forEach(function(p){ setReps(p, repsTxt(p.reps).split('/')[0], n); }); }
+  else if(k==='reps0'){ setReps(p0, v, v.indexOf('/')>=0?0:p0.reps.length); if(it.parts[1]) setReps(it.parts[1], repsTxt(it.parts[1].reps).split('/')[0], p0.reps.length); }
+  else if(k==='reps1'){ setReps(it.parts[1], v, p0.reps.length); }
+  else if(k==='rest'){ it.rest=parseInt(v,10)||60; }
+  else if(k==='bw0'){ if(v) p0.bw=1; else delete p0.bw; }
+  else if(k==='bw1'){ if(v) it.parts[1].bw=1; else delete it.parts[1].bw; }
+  else if(k==='sides0'){ if(v) p0.sides=2; else delete p0.sides; }
+  else if(k==='w'){ if(v) it.w=1; else delete it.w; }
+  else if(k==='bs'){ if(v){ it.bs=1; it.parts[1]={ n:'Exercício B', reps:p0.reps.slice() }; } else { delete it.bs; it.parts=[p0]; p0.n=it.name; } }
+  else if(k==='n0'||k==='n1'){ it.parts[+k[1]].n=v; }
+  else it[k]=v;
+  it.scheme = schemeOf(it); saveDraft();
+  if(commit || t.type==='checkbox') renderDays();
+}
+
+/* ---------- catálogo ---------- */
+function renderCat(){
+  var q=$('q').value.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim();
+  var list = catalog.filter(function(c){ return !q || (c.name+' '+(c.e||'')).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().indexOf(q)>=0; });
+  $('cat').innerHTML = list.map(function(c){ var i=catalog.indexOf(c);
+    return '<div class="item" data-cat="'+i+'"><div class="thumb" style="color:var(--yellow)">'+icon(c.i)+'</div><div class="nm">'+esc(c.name)+'<small>'+esc(c.type==='cardio'?(c.min?c.min+' min':'cardio / alongamento'):(c.scheme||''))+(c.e?' · '+esc(c.e):'')+'</small></div><span class="ok" style="color:var(--yellow)">＋</span></div>'; }).join('')
+    || '<div class="hint">Nada encontrado. Use “＋ Exercício em branco” no dia.</div>';
+}
+$('q').oninput=renderCat;
+$('cat').addEventListener('click', function(e){
+  var b=e.target.closest('[data-cat]'); if(!b) return;
+  var c=JSON.parse(JSON.stringify(catalog[+b.dataset.cat])); c.id=uniqId(c.name);
+  curDay().items.push(c); editing=null; changed(); msg('“'+c.name+'” adicionado ao '+curDay().title+'.');
+});
+
+/* ---------- saída ---------- */
+function output(){
+  var f=JSON.parse(JSON.stringify(F)); if(!f.key && fichas[f.slug] && fichas[f.slug].key) f.key=fichas[f.slug].key;
+  return '/* Ficha de '+(f.name||'aluno')+' — gerada pelo painel do Leo (admin.html) */\nwindow.FICHA = '+JSON.stringify(f,null,1)+';\n';
+}
+function check(){ if(!F.name || !F.slug){ msg('Preencha o nome do aluno antes.'); return false; } return true; }
+$('prevBtn').addEventListener('click', function(e){ saveDraft(); if(!LS){ e.preventDefault(); msg('A prévia precisa do armazenamento do navegador, que está bloqueado aqui.'); } });
+$('dlBtn').onclick=function(){ if(!check()) return; var a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([output()],{type:'text/javascript'})); a.download='data.js'; document.body.appendChild(a); a.click(); a.remove(); msg('data.js baixado. Envie para publicar em alunos/'+F.slug+'/.'); };
+$('cpBtn').onclick=function(){ if(!check()) return; var o=$('out'); o.value=output(); o.style.display='block';
+  try{ navigator.clipboard.writeText(o.value).then(function(){ msg('Copiado.'); },function(){ o.select(); msg('Selecione o texto e copie.'); }); }catch(e){ o.select(); msg('Selecione o texto e copie.'); } };
+
+function changed(){ saveDraft(); renderDays(); }
+function renderAll(){ renderStudent(); renderDays(); }
+loadAll().then(function(){
+  buildCatalog();
+  $('pick').innerHTML = '<option value="">＋ Ficha nova</option>' + ALUNOS.map(function(a){ return '<option value="'+esc(a.slug)+'">'+esc(a.name)+'</option>'; }).join('');
+  renderCat(); open('');
+});
+})();
+</script>
+</body>
+</html>
