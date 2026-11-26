@@ -87,7 +87,7 @@ nav{display:flex;flex-wrap:wrap;gap:8px;padding:14px 0;position:sticky;top:0;bac
 .set{display:flex;align-items:center;gap:7px;background:#171C22;border:1px solid var(--line);border-radius:8px;padding:7px 8px;flex-wrap:wrap}
 .set-n{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);width:50px;flex:none;white-space:nowrap}
 .set-r{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;width:52px;flex:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.loads{flex:1 1 140px;min-width:0;display:flex;flex-direction:column;gap:6px}
+.loads{flex:1 1 112px;min-width:0;display:flex;flex-direction:column;gap:6px}
 .set.multi .loads{flex-basis:100%;order:5}
 .stepper{display:flex;align-items:center;gap:4px;min-width:0}
 .pl{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:var(--day);width:14px;flex:none}
@@ -180,3 +180,4 @@ body.playing #rest{bottom:calc(66px + var(--safe))}
 .toast{position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:90;background:var(--card);border:1px solid var(--yellow);color:var(--chalk);
   padding:10px 14px;border-radius:10px;font-size:13.5px;max-width:92vw;box-shadow:0 8px 24px rgba(0,0,0,.45)}
 
+@media (max-width:420px){ .set{gap:5px;padding:7px 6px} .set-n{width:46px} .set-r{width:44px} .step{width:27px} .stepper{gap:3px} .prev{padding-left:51px} }
